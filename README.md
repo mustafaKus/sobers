@@ -1,6 +1,8 @@
 # sobers
 An example ETL Design for the csv files from different sources
 
+Each source has its own implementation and they return suitable transformed series for each column
+
 
 ```
 pip install -r requirements.txt
