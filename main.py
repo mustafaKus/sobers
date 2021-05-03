@@ -1,7 +1,8 @@
 import os
 from argparse import ArgumentParser
 
-from statement_unifier import Bank1Statement, Bank2Statement, Bank3Statement, StatementsUnifier
+from statement_unifier import Bank1StatementTransformer, Bank2StatementTransformer, Bank3StatementTransformer, \
+    StatementsUnifier
 
 if __name__ == "__main__":
 
@@ -10,11 +11,11 @@ if __name__ == "__main__":
     parser.add_argument("-o", "--output-file-name", default="unified_statement.csv", help="output file name")
     args = parser.parse_args()
 
-    bank_1_statement = Bank1Statement(
+    bank_1_statement = Bank1StatementTransformer(
         "https://gist.githubusercontent.com/Attumm/3927bfab39b32d401dc0a4ca8db995bd/raw/b005c3dd94090d656ca2b00d7c2ac50ddeb3d88c/bank1.csv")
-    bank_2_statement = Bank2Statement(
+    bank_2_statement = Bank2StatementTransformer(
         "https://gist.githubusercontent.com/Attumm/3927bfab39b32d401dc0a4ca8db995bd/raw/b005c3dd94090d656ca2b00d7c2ac50ddeb3d88c/bank2.csv")
-    bank_3_statement = Bank3Statement(
+    bank_3_statement = Bank3StatementTransformer(
         "https://gist.githubusercontent.com/Attumm/3927bfab39b32d401dc0a4ca8db995bd/raw/b005c3dd94090d656ca2b00d7c2ac50ddeb3d88c/bank3.csv")
 
     statements_unifier = StatementsUnifier(args.directory_path, args.output_file_name)

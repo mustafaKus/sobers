@@ -7,7 +7,7 @@ import sys
 from datetime import datetime
 import os
 
-class Statement(ABC):
+class AbstractStatementTransformer(ABC):
 
     """Implements the statement class"""
 
@@ -19,7 +19,7 @@ class Statement(ABC):
         except OSError as e:
             raise type(e)(
                 f"failed to read the csv file at {source_csv_file_path}" + str(e)).with_traceback(sys.exc_info()[2])
-        self._statement_df = Statement.create_statement_df()
+        self._statement_df = AbstractStatementTransformer.create_statement_df()
 
     @abstractmethod
     def _amount(self):
@@ -44,7 +44,7 @@ class Statement(ABC):
     @staticmethod
     def create_statement_df():
         """Creates the empty statement df"""
-        return pd.DataFrame(columns=Statement._COLUMNS)
+        return pd.DataFrame(columns=AbstractStatementTransformer._COLUMNS)
 
     def df(self):
         """Returns the statement as a dataframe"""
@@ -56,27 +56,7 @@ class Statement(ABC):
         return self._statement_df
 
 
-class StatementsUnifier:
-
-    """Implements a unifier for the bank statements"""
-
-
-    def __init__(self, output_file_directory_path, output_file_name):
-        self._unified_statements_df = Statement.create_statement_df()
-        if not os.path.isdir(output_file_directory_path):
-            raise NotADirectoryError(f"the {output_file_directory_path} directory path does not belong to a directory")
-        self._output_file_path = os.path.join(output_file_directory_path, output_file_name)
-
-    def add_statement(self, statement_df):
-        """Adds statement dataframe with the unified statements dataframe"""
-        self._unified_statements_df = pd.concat([self._unified_statements_df, statement_df], ignore_index=True)
-
-    def write(self):
-        """Writes the unified csv file to the specified output"""
-        self._unified_statements_df.sort_values("datetime").to_csv(self._output_file_path, index=False)
-
-
-class Bank1Statement(Statement):
+class Bank1StatementTransformer(AbstractStatementTransformer):
 
     """Implements a statement class for the Bank 1 Statement"""
 
@@ -96,7 +76,7 @@ class Bank1Statement(Statement):
         return self._source_df["to"]
 
 
-class Bank2Statement(Statement):
+class Bank2StatementTransformer(AbstractStatementTransformer):
 
     """Implements a statement class for the Bank 2 Statement"""
 
@@ -116,7 +96,7 @@ class Bank2Statement(Statement):
         return self._source_df["to"]
 
 
-class Bank3Statement(Statement):
+class Bank3StatementTransformer(AbstractStatementTransformer):
 
     """Implements a statement class for the Bank 3 Statement"""
 
@@ -134,3 +114,22 @@ class Bank3Statement(Statement):
 
     def _to(self):
         return self._source_df["to"]
+
+class StatementsUnifier:
+
+    """Implements a unifier for the bank statements"""
+
+
+    def __init__(self, output_file_directory_path, output_file_name):
+        self._unified_statements_df = AbstractStatementTransformer.create_statement_df()
+        if not os.path.isdir(output_file_directory_path):
+            raise NotADirectoryError(f"the {output_file_directory_path} directory path does not belong to a directory")
+        self._output_file_path = os.path.join(output_file_directory_path, output_file_name)
+
+    def add_statement(self, statement_df):
+        """Adds statement dataframe with the unified statements dataframe"""
+        self._unified_statements_df = pd.concat([self._unified_statements_df, statement_df], ignore_index=True)
+
+    def write(self):
+        """Writes the unified csv file to the specified output"""
+        self._unified_statements_df.sort_values("datetime").to_csv(self._output_file_path, index=False)
